@@ -8,13 +8,40 @@ class HomePage extends StatelessWidget {
         title: Text('Cuentas por cobrar'),
       ),
       drawer: _crearMenu(),
-      body: Column(),
+      body:Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+       children: <Widget>[
+          Column(
+            mainAxisAlignment:MainAxisAlignment.center,
+            children: <Widget>[
+              Center(
+                child: Text('Bievenido a tus cuentas', 
+                style: TextStyle( fontSize: 25),)
+              )
+              
+            ],
+          ),
+       ], 
+      )
       
     );
   }
 
   Drawer _crearMenu() {
 
-    return Drawer();
+    final textStyle = TextStyle(fontSize: 25, );
+    
+    return Drawer(
+      child: SafeArea(
+        child:Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text('Inicio', style: textStyle,),
+            Text('Personas', style: textStyle,),
+            Text('Cuentas x cobrar', style: textStyle,)
+          ],
+        )
+      ),
+    );
   }
 }
