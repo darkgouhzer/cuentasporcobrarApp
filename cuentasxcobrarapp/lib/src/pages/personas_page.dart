@@ -1,9 +1,9 @@
 import 'package:cuentasxcobrarapp/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
-  static final String routeName = 'home';
-  
+class PersonasPage extends StatelessWidget {
+  static final String routeName = 'personas';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
             mainAxisAlignment:MainAxisAlignment.center,
             children: <Widget>[
               Center(
-                child: Text('Bievenido a tus cuentas', 
+                child: Text('Personas', 
                 style: TextStyle( fontSize: 25),)
               )
               
