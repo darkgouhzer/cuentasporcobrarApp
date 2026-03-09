@@ -1,0 +1,126 @@
+# =============================================
+# DEPENDENCIAS
+# =============================================
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# =============================================
+# VARIABLES DE ENTORNO — NUNCA subir al repo
+# =============================================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.env
+
+# =============================================
+# BUILD / COMPILACIÓN
+# =============================================
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# =============================================
+# ANGULAR
+# =============================================
+.angular/
+coreflow-app/dist/
+coreflow-app/.angular/
+
+# =============================================
+# NESTJS / TYPESCRIPT
+# =============================================
+*.js.map
+*.d.ts.map
+
+# =============================================
+# PRISMA (archivos generados)
+# =============================================
+generated/
+
+# =============================================
+# LOGS
+# =============================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =============================================
+# SISTEMA OPERATIVO
+# =============================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# =============================================
+# IDEs Y EDITORES
+# =============================================
+.idea/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# VS Code (excepto settings compartidos del proyecto)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# =============================================
+# FLUTTER (proyecto legacy — cuentasxcobrarapp)
+# =============================================
+cuentasxcobrarapp/.dart_tool/
+cuentasxcobrarapp/.flutter-plugins
+cuentasxcobrarapp/.flutter-plugins-dependencies
+cuentasxcobrarapp/.pub-cache/
+cuentasxcobrarapp/.pub/
+cuentasxcobrarapp/build/
+cuentasxcobrarapp/.packages
+
+# =============================================
+# TESTING
+# =============================================
+coverage/
+.nyc_output/
+*.lcov
+
+# =============================================
+# CACHÉ
+# =============================================
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo

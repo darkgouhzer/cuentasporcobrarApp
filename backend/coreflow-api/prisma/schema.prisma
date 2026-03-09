@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model clientes {
+  idCliente          Int           @id @default(autoincrement())
+  idUsuario          Int
+  nombre             String        @db.VarChar(100)
+  apellidoPaterno    String        @db.VarChar(100)
+  apellidoMaterno    String?       @db.VarChar(100)
+  telefono           String?       @db.VarChar(15)
+  email              String?       @db.VarChar(100)
+  tipo               clientes_tipo @default(CLIENTE)
+  activo             Boolean       @default(true)
+  fechaRegistro      DateTime      @default(now()) @db.DateTime(0)
+  fechaActualizacion DateTime?     @db.DateTime(0)
+  usuarios           usuarios      @relation(fields: [idUsuario], references: [idUsuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_clientes_usuario")
+  cuentas            cuentas[]
+
+  @@index([idUsuario], map: "idx_clientes_usuario")
+}
+
+model conceptos {
+  idConcepto     Int              @id @default(autoincrement())
+  idUsuario      Int?
+  nombre         String           @db.VarChar(100)
+  tipo           conceptos_tipo   @default(OTRO)
+  precioDefault  Decimal          @default(0.00) @db.Decimal(10, 2)
+  activo         Boolean          @default(true)
+  usuarios       usuarios?        @relation(fields: [idUsuario], references: [idUsuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_conceptos_usuario")
+  cuenta_detalle cuenta_detalle[]
+
+  @@index([idUsuario], map: "fk_conceptos_usuario")
+}
+
+model cuenta_detalle {
+  idDetalle      Int                         @id @default(autoincrement())
+  idCuenta       Int
+  idConcepto     Int?
+  descripcion    String?                     @db.VarChar(200)
+  tipoConcepto   cuenta_detalle_tipoConcepto @default(OTRO)
+  cantidad       Decimal                     @default(1.00) @db.Decimal(10, 2)
+  precioUnitario Decimal                     @default(0.00) @db.Decimal(10, 2)
+  importe        Decimal                     @default(0.00) @db.Decimal(10, 2)
+  fecha          DateTime                    @default(now()) @db.DateTime(0)
+  conceptos      conceptos?                  @relation(fields: [idConcepto], references: [idConcepto], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_concepto")
+  cuentas        cuentas                     @relation(fields: [idCuenta], references: [idCuenta], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_cuenta")
+
+  @@index([idConcepto], map: "fk_detalle_concepto")
+  @@index([idCuenta], map: "idx_detalle_cuenta")
+}
+
+model cuentas {
+  idCuenta           Int              @id @default(autoincrement())
+  idCliente          Int
+  tipo               cuentas_tipo     @default(POR_COBRAR)
+  estado             cuentas_estado   @default(ABIERTA)
+  descripcion        String?          @db.VarChar(200)
+  importeTotal       Decimal          @default(0.00) @db.Decimal(10, 2)
+  importePagado      Decimal          @default(0.00) @db.Decimal(10, 2)
+  saldo              Decimal          @default(0.00) @db.Decimal(10, 2)
+  fechaEmision       DateTime         @default(now()) @db.DateTime(0)
+  fechaVencimiento   DateTime?        @db.DateTime(0)
+  fechaActualizacion DateTime?        @db.DateTime(0)
+  cuenta_detalle     cuenta_detalle[]
+  clientes           clientes         @relation(fields: [idCliente], references: [idCliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_cuentas_cliente")
+  movimientos        movimientos[]
+
+  @@index([idCliente], map: "idx_cuentas_cliente")
+  @@index([estado], map: "idx_cuentas_estado")
+}
+
+model movimientos {
+  idMovimiento Int              @id @default(autoincrement())
+  idCuenta     Int
+  tipo         movimientos_tipo
+  importe      Decimal          @default(0.00) @db.Decimal(10, 2)
+  referencia   String?          @db.VarChar(100)
+  notas        String?          @db.VarChar(200)
+  fecha        DateTime         @default(now()) @db.DateTime(0)
+  cuentas      cuentas          @relation(fields: [idCuenta], references: [idCuenta], onDelete: NoAction, onUpdate: NoAction, map: "fk_movimientos_cuenta")
+
+  @@index([idCuenta], map: "idx_movimientos_cuenta")
+}
+
+model usuarios {
+  idUsuario     Int          @id @default(autoincrement())
+  nombre        String       @db.VarChar(100)
+  email         String       @unique(map: "uq_usuarios_email") @db.VarChar(100)
+  passwordHash  String       @db.VarChar(255)
+  rol           usuarios_rol @default(USUARIO)
+  activo        Boolean      @default(true)
+  fechaRegistro DateTime     @default(now()) @db.DateTime(0)
+  clientes      clientes[]
+  conceptos     conceptos[]
+}
+
+enum movimientos_tipo {
+  ABONO
+  CARGO
+  AJUSTE
+  CANCELACION
+}
+
+enum cuentas_tipo {
+  POR_COBRAR
+  POR_PAGAR
+}
+
+enum conceptos_tipo {
+  PRODUCTO
+  SERVICIO
+  HORA_TRABAJO
+  OTRO
+}
+
+enum cuentas_estado {
+  ABIERTA
+  PAGADA
+  VENCIDA
+  CANCELADA
+}
+
+enum cuenta_detalle_tipoConcepto {
+  PRODUCTO
+  SERVICIO
+  HORA_TRABAJO
+  OTRO
+}
+
+enum usuarios_rol {
+  ADMIN
+  USUARIO
+}
+
+enum clientes_tipo {
+  CLIENTE
+  PROVEEDOR
+  AMBOS
+}
