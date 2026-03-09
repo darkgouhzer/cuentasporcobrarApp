@@ -1,0 +1,55 @@
+<div class="app-shell" [class.sidebar-collapsed]="!sidebarOpen()">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-icon">⬡</span>
+      @if (sidebarOpen()) {
+        <span class="brand-name">CoreFlow</span>
+      }
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">◈</span>
+        @if (sidebarOpen()) { <span>Dashboard</span> }
+      </a>
+      <a routerLink="/clientes" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">👥</span>
+        @if (sidebarOpen()) { <span>Clientes</span> }
+      </a>
+      <a routerLink="/cuentas" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">💳</span>
+        @if (sidebarOpen()) { <span>Cuentas</span> }
+      </a>
+      <a routerLink="/conceptos" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🏷</span>
+        @if (sidebarOpen()) { <span>Conceptos</span> }
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      @if (sidebarOpen() && currentUser()) {
+        <div class="user-info">
+          <span class="user-name">{{ currentUser()!.nombre || currentUser()!.email }}</span>
+          <span class="user-role">{{ currentUser()!.rol }}</span>
+        </div>
+      }
+      <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
+        <span>🚪</span>
+        @if (sidebarOpen()) { <span>Salir</span> }
+      </button>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <div class="content-area">
+    <header class="topbar">
+      <button class="toggle-btn" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+        ☰
+      </button>
+    </header>
+    <main class="page-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

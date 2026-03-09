@@ -1,0 +1,82 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Cuentas por Cobrar</h1>
+    <a routerLink="/cuentas/nueva" class="btn-primary">+ Nueva cuenta</a>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filter-bar">
+    <button
+      class="filter-btn"
+      [class.active]="filtroTipo() === undefined"
+      (click)="setFiltro(undefined)">
+      Todas
+    </button>
+    <button
+      class="filter-btn"
+      [class.active]="filtroTipo() === 'POR_COBRAR'"
+      (click)="setFiltro('POR_COBRAR')">
+      Por Cobrar
+    </button>
+    <button
+      class="filter-btn"
+      [class.active]="filtroTipo() === 'POR_PAGAR'"
+      (click)="setFiltro('POR_PAGAR')">
+      Por Pagar
+    </button>
+  </div>
+
+  @if (loading()) {
+    <app-spinner />
+  } @else if (error()) {
+    <div class="alert-error">{{ error() }}</div>
+  } @else if (cuentas().length === 0) {
+    <div class="empty-state">
+      <p>No hay cuentas registradas.</p>
+      <a routerLink="/cuentas/nueva" class="btn-primary">Crear primera cuenta</a>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Tipo</th>
+            <th>Total</th>
+            <th>Pagado</th>
+            <th>Saldo</th>
+            <th>Estado</th>
+            <th>Vence</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of cuentas(); track c.idCuenta) {
+            <tr>
+              <td>
+                @if (c.cliente) {
+                  {{ c.cliente.nombre }} {{ c.cliente.apellidoPaterno }}
+                } @else {
+                  —
+                }
+              </td>
+              <td><span class="badge info">{{ c.tipo }}</span></td>
+              <td>{{ formatMoney(c.importeTotal) }}</td>
+              <td>{{ formatMoney(c.importePagado) }}</td>
+              <td><strong>{{ formatMoney(c.saldo) }}</strong></td>
+              <td>
+                <span class="badge" [attr.data-estado]="c.estado">
+                  {{ c.estado }}
+                </span>
+              </td>
+              <td>{{ c.fechaVencimiento ? (c.fechaVencimiento | slice:0:10) : '—' }}</td>
+              <td class="actions">
+                <a [routerLink]="['/cuentas', c.idCuenta]" class="btn-icon" title="Ver detalle">👁</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

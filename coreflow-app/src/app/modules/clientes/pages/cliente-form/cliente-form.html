@@ -1,0 +1,62 @@
+<div class="page">
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>{{ isEdit() ? 'Editar cliente' : 'Nuevo cliente' }}</h1>
+  </div>
+
+  @if (loading()) {
+    <app-spinner />
+  } @else {
+    <div class="form-card">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="field">
+            <label>Nombre *</label>
+            <input type="text" formControlName="nombre" placeholder="Nombre(s)" />
+          </div>
+          <div class="field">
+            <label>Apellido paterno *</label>
+            <input type="text" formControlName="apellidoPaterno" placeholder="Apellido paterno" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Apellido materno</label>
+            <input type="text" formControlName="apellidoMaterno" placeholder="Apellido materno" />
+          </div>
+          <div class="field">
+            <label>Tipo *</label>
+            <select formControlName="tipo">
+              @for (tipo of tipos; track tipo) {
+                <option [value]="tipo">{{ tipo }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Teléfono</label>
+            <input type="tel" formControlName="telefono" placeholder="10 dígitos" />
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="alert-error">{{ error() }}</div>
+        }
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="goBack()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="saving() || form.invalid">
+            {{ saving() ? 'Guardando…' : (isEdit() ? 'Guardar cambios' : 'Crear cliente') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

@@ -1,0 +1,54 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Clientes</h1>
+    <a routerLink="/clientes/nuevo" class="btn-primary">+ Nuevo cliente</a>
+  </div>
+
+  @if (loading()) {
+    <app-spinner />
+  } @else if (error()) {
+    <div class="alert-error">{{ error() }}</div>
+  } @else if (clientes().length === 0) {
+    <div class="empty-state">
+      <p>No hay clientes registrados.</p>
+      <a routerLink="/clientes/nuevo" class="btn-primary">Agregar primero</a>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cliente of clientes(); track cliente.idCliente) {
+            <tr>
+              <td>
+                <strong>{{ cliente.nombre }} {{ cliente.apellidoPaterno }}</strong>
+                @if (cliente.apellidoMaterno) {
+                  <span> {{ cliente.apellidoMaterno }}</span>
+                }
+              </td>
+              <td>{{ cliente.telefono || '—' }}</td>
+              <td>{{ cliente.email || '—' }}</td>
+              <td>
+                <span class="badge" [attr.data-tipo]="cliente.tipo">
+                  {{ tipoLabel(cliente.tipo) }}
+                </span>
+              </td>
+              <td class="actions">
+                <a [routerLink]="['/clientes', cliente.idCliente]" class="btn-icon" title="Editar">✏️</a>
+                <button class="btn-icon danger" (click)="eliminar(cliente.idCliente)" title="Eliminar">🗑</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

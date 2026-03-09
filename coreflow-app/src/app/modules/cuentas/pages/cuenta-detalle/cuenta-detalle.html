@@ -1,0 +1,218 @@
+<div class="page">
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">← Cuentas</button>
+    <h1>Detalle de cuenta</h1>
+    @if (cuenta()?.estado === 'ABIERTA') {
+      <button class="btn-danger" (click)="cancelarCuenta()">Cancelar cuenta</button>
+    }
+  </div>
+
+  @if (loading()) {
+    <app-spinner />
+  } @else if (error()) {
+    <div class="alert-error">{{ error() }}</div>
+  } @else if (cuenta()) {
+    <!-- Resumen de cuenta -->
+    <div class="cuenta-summary">
+      <div class="summary-card">
+        <span class="label">Cliente</span>
+        @if (cuenta()!.cliente) {
+          <span class="value">{{ cuenta()!.cliente!.nombre }} {{ cuenta()!.cliente!.apellidoPaterno }}</span>
+        }
+      </div>
+      <div class="summary-card">
+        <span class="label">Tipo</span>
+        <span class="value"><span class="badge info">{{ cuenta()!.tipo }}</span></span>
+      </div>
+      <div class="summary-card">
+        <span class="label">Estado</span>
+        <span class="value">
+          <span class="badge" [attr.data-estado]="cuenta()!.estado">{{ cuenta()!.estado }}</span>
+        </span>
+      </div>
+      <div class="summary-card highlight">
+        <span class="label">Total</span>
+        <span class="value money">{{ formatMoney(cuenta()!.importeTotal) }}</span>
+      </div>
+      <div class="summary-card">
+        <span class="label">Pagado</span>
+        <span class="value money success">{{ formatMoney(cuenta()!.importePagado) }}</span>
+      </div>
+      <div class="summary-card highlight">
+        <span class="label">Saldo</span>
+        <span class="value money">{{ formatMoney(cuenta()!.saldo) }}</span>
+      </div>
+    </div>
+
+    <!-- ── Conceptos / Detalle ── -->
+    <section class="section">
+      <div class="section-header">
+        <h2>Conceptos facturados</h2>
+        @if (cuenta()!.estado === 'ABIERTA') {
+          <button class="btn-primary sm" (click)="showDetalleForm.set(true)">+ Agregar concepto</button>
+        }
+      </div>
+
+      @if (detalles().length === 0) {
+        <div class="empty-state sm"><p>Sin conceptos registrados.</p></div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Descripción</th>
+              <th>Tipo</th>
+              <th>Cantidad</th>
+              <th>Precio unit.</th>
+              <th>Importe</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of detalles(); track d.idDetalle) {
+              <tr>
+                <td>{{ d.descripcion || '—' }}</td>
+                <td><span class="badge">{{ d.tipoConcepto }}</span></td>
+                <td>{{ d.cantidad }}</td>
+                <td>{{ formatMoney(d.precioUnitario) }}</td>
+                <td><strong>{{ formatMoney(d.importe) }}</strong></td>
+                <td>
+                  @if (cuenta()!.estado === 'ABIERTA') {
+                    <button class="btn-icon danger" (click)="eliminarDetalle(d.idDetalle)">🗑</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <!-- Formulario detalle inline -->
+      @if (showDetalleForm()) {
+        <div class="inline-form">
+          <h3>Nuevo concepto</h3>
+          <form [formGroup]="detalleForm" (ngSubmit)="saveDetalle()">
+            <div class="form-row">
+              <div class="field">
+                <label>Concepto (opcional)</label>
+                <select formControlName="idConcepto" (change)="onConceptoChange($event)">
+                  <option [value]="null">— Sin concepto —</option>
+                  @for (c of conceptos(); track c.idConcepto) {
+                    <option [value]="c.idConcepto">{{ c.nombre }}</option>
+                  }
+                </select>
+              </div>
+              <div class="field">
+                <label>Tipo *</label>
+                <select formControlName="tipoConcepto">
+                  @for (t of tiposConcepto; track t) {
+                    <option [value]="t">{{ t }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Descripción</label>
+              <input type="text" formControlName="descripcion" placeholder="Descripción del concepto" />
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label>Cantidad *</label>
+                <input type="number" formControlName="cantidad" step="0.01" min="0.01" />
+              </div>
+              <div class="field">
+                <label>Precio unitario *</label>
+                <input type="number" formControlName="precioUnitario" step="0.01" min="0" />
+              </div>
+              <div class="field">
+                <label>Importe</label>
+                <input type="text" [value]="importePreview()" readonly class="readonly" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" (click)="showDetalleForm.set(false)">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="savingDetalle() || detalleForm.invalid">
+                {{ savingDetalle() ? 'Guardando…' : 'Agregar' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    </section>
+
+    <!-- ── Movimientos ── -->
+    <section class="section">
+      <div class="section-header">
+        <h2>Movimientos</h2>
+        @if (cuenta()!.estado === 'ABIERTA') {
+          <button class="btn-primary sm" (click)="showMovForm.set(true)">+ Registrar movimiento</button>
+        }
+      </div>
+
+      @if (movimientos().length === 0) {
+        <div class="empty-state sm"><p>Sin movimientos registrados.</p></div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Importe</th>
+              <th>Referencia</th>
+              <th>Notas</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of movimientos(); track m.idMovimiento) {
+              <tr>
+                <td>{{ m.fecha | slice:0:10 }}</td>
+                <td><span class="badge" [class.success]="m.tipo === 'ABONO'" [class.warning]="m.tipo !== 'ABONO'">{{ m.tipo }}</span></td>
+                <td><strong>{{ formatMoney(m.importe) }}</strong></td>
+                <td>{{ m.referencia || '—' }}</td>
+                <td>{{ m.notas || '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <!-- Formulario movimiento -->
+      @if (showMovForm()) {
+        <div class="inline-form">
+          <h3>Nuevo movimiento</h3>
+          <form [formGroup]="movForm" (ngSubmit)="saveMovimiento()">
+            <div class="form-row">
+              <div class="field">
+                <label>Tipo *</label>
+                <select formControlName="tipo">
+                  @for (t of tiposMovimiento; track t) {
+                    <option [value]="t">{{ t }}</option>
+                  }
+                </select>
+              </div>
+              <div class="field">
+                <label>Importe *</label>
+                <input type="number" formControlName="importe" step="0.01" min="0.01" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label>Referencia</label>
+                <input type="text" formControlName="referencia" placeholder="Número de transferencia, etc." />
+              </div>
+              <div class="field">
+                <label>Notas</label>
+                <input type="text" formControlName="notas" placeholder="Observaciones" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" (click)="showMovForm.set(false)">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="savingMov() || movForm.invalid">
+                {{ savingMov() ? 'Guardando…' : 'Registrar' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    </section>
+  }
+</div>

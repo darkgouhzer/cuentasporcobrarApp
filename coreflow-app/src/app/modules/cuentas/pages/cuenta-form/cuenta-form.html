@@ -1,0 +1,63 @@
+<div class="page">
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>Nueva cuenta</h1>
+  </div>
+
+  @if (loading()) {
+    <app-spinner />
+  } @else {
+    <div class="form-card">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="field">
+            <label>Cliente *</label>
+            <select formControlName="idCliente">
+              <option [value]="null" disabled>Selecciona un cliente</option>
+              @for (c of clientes(); track c.idCliente) {
+                <option [value]="c.idCliente">
+                  {{ c.nombre }} {{ c.apellidoPaterno }}
+                </option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label>Tipo *</label>
+            <select formControlName="tipo">
+              @for (t of tipos; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Descripción</label>
+          <input type="text" formControlName="descripcion" placeholder="Descripción breve" />
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Importe total *</label>
+            <input type="number" formControlName="importeTotal" step="0.01" min="0.01" />
+          </div>
+          <div class="field">
+            <label>Fecha vencimiento</label>
+            <input type="date" formControlName="fechaVencimiento" />
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="alert-error">{{ error() }}</div>
+        }
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="goBack()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="saving() || form.invalid">
+            {{ saving() ? 'Guardando…' : 'Crear cuenta' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

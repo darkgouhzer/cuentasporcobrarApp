@@ -1,0 +1,87 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+  </div>
+
+  @if (loading()) {
+    <app-spinner />
+  } @else {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">👥</div>
+        <div class="stat-body">
+          <span class="stat-label">Clientes activos</span>
+          <span class="stat-value">{{ totalClientes() }}</span>
+        </div>
+        <a routerLink="/clientes" class="stat-link">Ver clientes →</a>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green">💰</div>
+        <div class="stat-body">
+          <span class="stat-label">Por cobrar (saldo)</span>
+          <span class="stat-value">{{ formatMoney(porCobrar()) }}</span>
+        </div>
+        <a routerLink="/cuentas" [queryParams]="{tipo: 'POR_COBRAR'}" class="stat-link">Ver cuentas →</a>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon orange">📋</div>
+        <div class="stat-body">
+          <span class="stat-label">Cuentas abiertas</span>
+          <span class="stat-value">{{ cuentasAbiertas().length }}</span>
+        </div>
+        <a routerLink="/cuentas" class="stat-link">Ver todas →</a>
+      </div>
+
+      <div class="stat-card" [class.alert]="cuentasVencidas().length > 0">
+        <div class="stat-icon red">⚠️</div>
+        <div class="stat-body">
+          <span class="stat-label">Cuentas vencidas</span>
+          <span class="stat-value">{{ cuentasVencidas().length }}</span>
+        </div>
+        <a routerLink="/cuentas" class="stat-link">Revisar →</a>
+      </div>
+    </div>
+
+    <!-- Últimas cuentas abiertas -->
+    @if (cuentasAbiertas().length > 0) {
+      <section class="section">
+        <div class="section-header">
+          <h2>Cuentas abiertas recientes</h2>
+          <a routerLink="/cuentas" class="btn-secondary sm">Ver todas</a>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Tipo</th>
+                <th>Saldo</th>
+                <th>Vence</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of cuentasAbiertas().slice(0, 8); track c.idCuenta) {
+                <tr>
+                  <td>
+                    @if (c.cliente) {
+                      {{ c.cliente.nombre }} {{ c.cliente.apellidoPaterno }}
+                    }
+                  </td>
+                  <td><span class="badge info">{{ c.tipo }}</span></td>
+                  <td><strong>{{ formatMoney(c.saldo) }}</strong></td>
+                  <td>{{ c.fechaVencimiento ? (c.fechaVencimiento | slice:0:10) : '—' }}</td>
+                  <td>
+                    <a [routerLink]="['/cuentas', c.idCuenta]" class="btn-icon">👁</a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  }
+</div>

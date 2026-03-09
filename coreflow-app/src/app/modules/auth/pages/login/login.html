@@ -1,0 +1,49 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="brand">
+      <span class="brand-icon">⬡</span>
+      <h1>CoreFlow</h1>
+      <p>Gestión Financiera</p>
+    </div>
+
+    <h2>{{ isRegister() ? 'Crear cuenta' : 'Iniciar sesión' }}</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (isRegister()) {
+        <div class="field">
+          <label>Nombre</label>
+          <input type="text" formControlName="nombre" placeholder="Tu nombre" autocomplete="name" />
+        </div>
+      }
+
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input type="email" formControlName="email" placeholder="correo@ejemplo.com" autocomplete="email" />
+      </div>
+
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      @if (error()) {
+        <div class="error-msg">{{ error() }}</div>
+      }
+
+      <button type="submit" class="btn-primary" [disabled]="loading() || form.invalid">
+        @if (loading()) {
+          Cargando…
+        } @else {
+          {{ isRegister() ? 'Registrarse' : 'Entrar' }}
+        }
+      </button>
+    </form>
+
+    <p class="toggle-text">
+      {{ isRegister() ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?' }}
+      <button type="button" class="link-btn" (click)="toggleMode()">
+        {{ isRegister() ? 'Iniciar sesión' : 'Registrarse' }}
+      </button>
+    </p>
+  </div>
+</div>
